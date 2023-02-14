@@ -226,7 +226,7 @@ public class CoffeeMakerQuestImpl implements CoffeeMakerQuest {
 			retS = "N - Go north\nS - Go south\nL - Look and collect any items in the room\nI - Show inventory of items collected\nD - Drink coffee made from items in inventory\n";
 		}
 		else{
-			retS = "What?";
+			retS = "What?\n";
 		}
 
 		return retS;
