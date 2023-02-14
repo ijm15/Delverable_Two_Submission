@@ -248,7 +248,7 @@ public class CoffeeMakerQuestTest {
 	 */
 	@Test
 	public void testProcessCommandLCream() {
-		//Mockito.when(player.checkCream()).thenReturn(true);
+		Mockito.when(player.checkCream()).thenReturn(true);
 
 		String retVal = cmq.processCommand("l");
 		if(retVal == "There might be something here...\nYou found some creamy cream!\n"){
