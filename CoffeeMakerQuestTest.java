@@ -1,362 +1,235 @@
 package edu.pitt.cs;
+import java.util.*;
 
-import static org.junit.Assert.*;
+public class CoffeeMakerQuestImpl implements CoffeeMakerQuest {
 
-import org.junit.Test;
-import org.junit.*;
-import org.mockito.*;
-import static org.mockito.Mockito.*;
+	// TODO: Add more member variables and methods as needed.
+	private Room first;
 
-import java.util.ArrayList;
+	private Room sixth;
+	private Player player;
+	private ArrayList<Room> rooms;
+	private Room curRoom = null;
+	private boolean gameOver = false;
 
-public class CoffeeMakerQuestTest {
-
-	CoffeeMakerQuest cmq;
-	Player player;
-	ArrayList<Room> rooms;
-
-	@Before
-	public void setup() {
-		// 0. Turn on bug injection for Player and Room.
-		//Config.setBuggyPlayer(true);
-		//Config.setBuggyRoom(true);
-
-		// TODO: 1. Create a Player with no items (no coffee, no cream, no sugar)
-		// and assign to player.
-		// player =  Mockito.mock(Player.class);
-		// Mockito.when(player.checkCoffee()).thenReturn(false);
-		// Mockito.when(player.checkSugar()).thenReturn(false);
-		// Mockito.when(player.checkCream()).thenReturn(false);
-		player = Mockito.mock(Player.class);
-
-		// TODO: 2. Create 6 rooms as specified in rooms.config and add to rooms list.
-		Room roomOne = Mockito.mock(Room.class);
-		Mockito.when(roomOne.getFurnishing()).thenReturn("Quaint sofa");
-		Mockito.when(roomOne.getAdjective()).thenReturn("Small");
-		Mockito.when(roomOne.getItem()).thenReturn(Item.CREAM);
-		Mockito.when(roomOne.getNorthDoor()).thenReturn("Magenta");
-
-
-		Room roomTwo = Mockito.mock(Room.class);
-		Mockito.when(roomTwo.getFurnishing()).thenReturn("Sad record player");
-		Mockito.when(roomTwo.getAdjective()).thenReturn("Funny");
-		Mockito.when(roomTwo.getItem()).thenReturn(Item.NONE);
-		Mockito.when(roomTwo.getNorthDoor()).thenReturn("Beige");
-		Mockito.when(roomTwo.getSouthDoor()).thenReturn("Massive");
-
-
-		Room roomThree = Mockito.mock(Room.class);
-		Mockito.when(roomThree.getFurnishing()).thenReturn("Tight pizza");
-		Mockito.when(roomThree.getAdjective()).thenReturn("Refinanced");
-		Mockito.when(roomThree.getItem()).thenReturn(Item.COFFEE);
-		Mockito.when(roomThree.getNorthDoor()).thenReturn("Dead");
-		Mockito.when(roomThree.getSouthDoor()).thenReturn("Smart");
-
-
-		Room roomFour = Mockito.mock(Room.class);
-		Mockito.when(roomFour.getFurnishing()).thenReturn("Flat energy drink");
-		Mockito.when(roomFour.getAdjective()).thenReturn("Dumb");
-		Mockito.when(roomFour.getItem()).thenReturn(Item.NONE);
-		Mockito.when(roomFour.getNorthDoor()).thenReturn("Vivacious");
-		Mockito.when(roomFour.getSouthDoor()).thenReturn("Slim");
-
-
-		Room roomFive = Mockito.mock(Room.class);
-		Mockito.when(roomFive.getFurnishing()).thenReturn("Beautiful bag of money");
-		Mockito.when(roomFive.getAdjective()).thenReturn("Bloodthirsty");
-		Mockito.when(roomFive.getItem()).thenReturn(Item.NONE);
-		Mockito.when(roomFive.getNorthDoor()).thenReturn("Purple");
-		Mockito.when(roomFive.getSouthDoor()).thenReturn("Sandy");
-
-
-		Room roomSix = Mockito.mock(Room.class);
-		Mockito.when(roomSix.getFurnishing()).thenReturn("Perfect air hockey table");
-		Mockito.when(roomSix.getAdjective()).thenReturn("Rough");
-		Mockito.when(roomSix.getItem()).thenReturn(Item.SUGAR);
-		Mockito.when(roomSix.getSouthDoor()).thenReturn("Minimalist");
-
-
-		rooms = new ArrayList<Room>();
-		rooms.add(roomOne);
-		rooms.add(roomTwo);
-		rooms.add(roomThree);
-		rooms.add(roomFour);
-		rooms.add(roomFive);
-		rooms.add(roomSix);
-
-
-
-
-
-
-		// 3. Create Coffee Maker Quest game using player and rooms, and assign to cmq.
-		cmq = CoffeeMakerQuest.createInstance(player, rooms);
-	}
-
-	@After
-	public void tearDown() {
-		cmq = null;
-		player = null;
-		rooms = null;
-	}
 
 	/**
-	 * Test case for String getInstructionsString().
+	 * Constructor. Rooms are laid out from south to north, such that the
+	 * first room in rooms becomes the southernmost room and the last room becomes
+	 * the northernmost room. Initially, the player is at the southernmost room.
 	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.getInstructionsString().
-	 * Postconditions: Return value is " INSTRUCTIONS (N,S,L,I,D,H) > ".
-	 * </pre>
+	 * @param player Player for this game
+	 * @param rooms  List of rooms in this game
 	 */
-	@Test
-	public void testGetInstructionsString() {
-		String retValue = cmq.getInstructionsString();
-		assertEquals("Reuturn value of getInstructionsString was wrong", " INSTRUCTIONS (N,S,L,I,D,H) > ",retValue);
+	CoffeeMakerQuestImpl(Player player, ArrayList<Room> rooms) {
+		this.player = player;
+		this.rooms = rooms;
+		this.first = rooms.get(0);
+		this.sixth = rooms.get(5);
+		this.curRoom = rooms.get(0);
+	}
+
+
+	/**
+	 * Whether the game is over. The game ends when the player drinks the coffee.
+	 * 
+	 * @return true if the game is over, false otherwise
+	 */
+	public boolean isGameOver() {
+		return gameOver;
 
 	}
 
 	/**
-	 * Test case for Room getCurrentRoom().
+	 * The method returns success if and only if: 1) The southernmost room has a
+	 * north door only, 2) The northernmost room has a south door only, and 3) The
+	 * rooms in the middle have both north and south doors. If there is only one
+	 * room, there should be no doors.
 	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.getCurrentRoom().
-	 * Postconditions: Return value is rooms.get(0).
-	 * </pre>
+	 * @return true if check successful, false otherwise
 	 */
-	@Test
-	public void testGetCurrentRoom() {
-		assertEquals("Return Value of cmq.getCurrentRoom() isn't rooms.get(0)", rooms.get(0), cmq.getCurrentRoom());
+	public boolean areDoorsPlacedCorrectly() {
+		boolean ret = false;
+
+		//System.out.println(first.getNorthDoor() != null && first.getSouthDoor() == null);
+		//System.out.println(sixth.getNorthDoor() == null && sixth.getSouthDoor() != null);
+		//System.out.println(areDoorsPlacedCorrectlyHelp());
+		if(first.getNorthDoor() != null && first.getSouthDoor() == null){
+			if(sixth.getNorthDoor() == null && sixth.getSouthDoor() != null){
+				if(areDoorsPlacedCorrectlyHelp()){
+					ret = true;
+				}
+			}
+		}
+		return ret;
+	}
+	/**
+	 * The method loops through the middle doors of the arraylist of doors
+	 * and checks to see if both doors exist. If not return false
+	 * 
+	 * @return true if the middle doors have both North and South Doors, false otherwise
+	 */
+	private boolean areDoorsPlacedCorrectlyHelp() {
+		boolean ret = true;
+		for(int i = 1;i<5;i++ ){
+			if((rooms.get(i).getNorthDoor() == null) || (rooms.get(i).getSouthDoor() == null) ){
+				ret = false;
+				break;
+			}
+		}
+		return ret;
+	}
+
+
+	/**
+	 * Checks whether each room has a unique adjective and furnishing.
+	 * 
+	 * @return true if check successful, false otherwise
+	 */
+
+	public boolean areRoomsUnique() {
+		ArrayList<String> adjs = new ArrayList<String>();
+		ArrayList<String> furnishings = new ArrayList<String>();
+		boolean ret = true;
+		for(int i = 0; i<rooms.size();i++)
+		{
+			if(rooms.get(i).getAdjective() == null || rooms.get(i).getFurnishing() == null){
+				ret = false;
+				break;
+			}
+
+			 if(((adjs.contains(rooms.get(i).getAdjective()))) || ((furnishings.contains(rooms.get(i).getFurnishing())))){
+			 	ret = false;
+			 	break;
+			 }
+			
+			adjs.add(rooms.get(i).getAdjective());
+			furnishings.add(rooms.get(i).getFurnishing());
+		}
+		return ret;
 	}
 
 	/**
-	 * Test case for void setCurrentRoom(Room room) and Room getCurrentRoom().
+	 * Returns the room the player is currently in. If location of player has not
+	 * yet been initialized with setCurrentRoom, returns null.
 	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.setCurrentRoom(rooms.get(2)).
-	 *                  Call cmq.getCurrentRoom().
-	 * Postconditions: Return value of cmq.setCurrentRoom(rooms.get(2)) is true. 
-	 *                 Return value of cmq.getCurrentRoom() is rooms.get(2).
-	 * </pre>
+	 * @return room player is in, or null if not yet initialized
 	 */
-	@Test
-	public void testSetCurrentRoom() {
-		// TODO
-		boolean bool = cmq.setCurrentRoom(rooms.get(2));
-		Room test = cmq.getCurrentRoom();
-
-		assertTrue("setCurrentRoom(rooms.get(2)) was false",bool);
-		assertEquals("cmq.getCurrentRoom() and rooms.get(2) wern't equal", rooms.get(2),test );
+	public Room getCurrentRoom() {
+		return curRoom;
 	}
 
 	/**
-	 * Test case for boolean areDoorsPlacedCorrectly() when check succeeds.
+	 * Set the current location of the player. If room does not exist in the game,
+	 * then the location of the player does not change and false is returned.
 	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.areDoorsPlacedCorrectly().
-	 * Postconditions: Return value of cmq.areDoorsPlacedCorrectly() is true.
-	 * </pre>
+	 * @param room the room to set as the player location
+	 * @return true if successful, false otherwise
 	 */
-	@Test
-	public void testAreDoorsPlacedCorrectly() {
-		boolean bool = cmq.areDoorsPlacedCorrectly();
-		assertTrue("Return value for areDoorsPlacedCorrectly() was true",bool);
+	public boolean setCurrentRoom(Room room) {
+		if(rooms.contains(room))
+		{
+			curRoom = room;
+			return true;
+		}
+		else
+			return false;
 	}
 
 	/**
-	 * Test case for boolean areDoorsPlacedCorrectly() when check fails.
+	 * Get the instructions string command prompt. It returns the following prompt:
+	 * " INSTRUCTIONS (N,S,L,I,D,H) > ".
 	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 *                rooms.get(3) is modified so that it has no south door.
-	 * Execution steps: Call cmq.areDoorsPlacedCorrectly().
-	 * Postconditions: Return value of cmq.areDoorsPlacedCorrectly() is false.
-	 * </pre>
+	 * @return comamnd prompt string
 	 */
-	@Test
-	public void testAreDoorsPlacedCorrectlyMissingSouthDoor() {
-		Room testRoom = Mockito.mock(Room.class);
-		Mockito.when(testRoom.getFurnishing()).thenReturn("Flat energy drink");
-		Mockito.when(testRoom.getAdjective()).thenReturn("Dumb");
-		Mockito.when(testRoom.getItem()).thenReturn(Item.NONE);
-		Mockito.when(testRoom.getNorthDoor()).thenReturn("Vivacious");
-		rooms.set(3, testRoom);
-
-		boolean bool = cmq.areDoorsPlacedCorrectly();
-		assertFalse("Return value for areDoorsPlacedCorrectly() was true ", bool);
+	public String getInstructionsString() {
+		return " INSTRUCTIONS (N,S,L,I,D,H) > ";
 	}
 
 	/**
-	 * Test case for boolean areRoomsUnique() when check fails.
+	 * Processes the user command given in String cmd and returns the response
+	 * string. For the list of commands, please see the Coffee Maker Quest
+	 * requirements documentation (note that commands can be both upper-case and
+	 * lower-case). For the response strings, observe the response strings printed
+	 * by coffeemaker.jar. The "N" and "S" commands potentially change the location
+	 * of the player. The "L" command potentially adds an item to the player
+	 * inventory. The "D" command drinks the coffee and ends the game. Make
+	 * sure you use Player.getInventoryString() whenever you need to display
+	 * the inventory.
 	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 *                rooms.get(2) is modified so that its adjective is modified to "Small".
-	 * Execution steps: Call cmq.areRoomsUnique().
-	 * Postconditions: Return value of cmq.areRoomsUnique() is false.
-	 * </pre>
+	 * @param cmd the user command
+	 * @return response string for the command
 	 */
-	@Test
-	public void testAreRoomsUniqueDuplicateAdjective() {
-		Room testRoom = Mockito.mock(Room.class);
-		Mockito.when(testRoom.getFurnishing()).thenReturn("Tight pizza");
-		Mockito.when(testRoom.getAdjective()).thenReturn("Small");
-		Mockito.when(testRoom.getItem()).thenReturn(Item.COFFEE);
-		Mockito.when(testRoom.getNorthDoor()).thenReturn("Dead");
-		Mockito.when(testRoom.getSouthDoor()).thenReturn("Smart");
-		rooms.set(2, testRoom);
+	public String processCommand(String cmd) {
+		String retS = "";
+		cmd = cmd.toUpperCase();
+		if(cmd.equals("N"))
+		{
+			int index = rooms.indexOf(getCurrentRoom());
+			if((index+1)>5){
+				retS = "A door in that direction does not exist.\n";
+			}
+			else{
+				setCurrentRoom(rooms.get(index + 1));
+			}
+		}
+		else if(cmd.equals("S"))
+		{
+			int index = rooms.indexOf(getCurrentRoom());
+			if((index-1)<0){
+				retS = "A door in that direction does not exist.\n";
+			}
+			else{
+				setCurrentRoom(rooms.get(index - 1));
+			}
 
-		boolean bool = cmq.areRoomsUnique();
+		}
+		else if(cmd.equals("L"))
+		{
+			if(getCurrentRoom().getItem() == Item.NONE){
+				retS = "You don't see anything out of the ordinary.\n";
+			}
+			else{
+				if(getCurrentRoom().getItem() == Item.SUGAR){
+					retS = "There might be something here...\nYou found some sweet sugar!\n";
+				}
+				else if(getCurrentRoom().getItem() == Item.CREAM){
+					retS = "There might be something here...\nYou found some creamy cream!\n";
+				}
+				else if(getCurrentRoom().getItem() == Item.COFFEE){
+					retS = "There might be something here...\nYou found some caffeinated coffee!\n";
+				}
+				player.addItem(getCurrentRoom().getItem());
+			}
 
-		assertFalse("The cmq.areRoomsUnique() call was true", bool);
+		}
+		else if(cmd.equals("I")){
+			retS = player.getInventoryString();
+		}
+		else if(cmd.equals("D")){
+			retS = player.getInventoryString();
 
+			if((player.checkSugar()) && (player.checkCoffee()) && (player.checkCream())){
+				retS += "\nYou drink the beverage and are ready to study!\nYou win!\n";
+			}
+			else if((!player.checkSugar()) && (!player.checkCoffee()) && (!player.checkCream())){
+				retS += "\nYou drink thin air and can only dream of coffee. You cannot study.\nYou lose!\n";
+			}//end
+			else{
+				retS += "\nYou refuse to drink this half-made sludge. You cannot study.\nYou lose!\n";
+			}//end if
 
+			gameOver = true;
 
-		
+		}
+		else if(cmd.equals("H")){
+			retS = "N - Go north\nS - Go south\nL - Look and collect any items in the room\nI - Show inventory of items collected\nD - Drink coffee made from items in inventory\n";
+		}
+		else{
+			retS = "What?";
+		}
+
+		return retS;
 	}
-
-	/**
-	 * Test case for String processCommand("I").
-	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 *                Player has no items.
-	 * Execution steps: Call cmq.processCommand("I").
-	 * Postconditions: Return value is "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n".
-	 * </pre>
-	 */
-	@Test
-	public void testProcessCommandI() {
-		Mockito.when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
-
-		String ret = cmq.processCommand("I");
-		assertEquals("Return from processing 'I' was incorrect\n", "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n", ret);
-	}
-
-	/**
-	 * Test case for String processCommand("l").
-	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.processCommand("l").
-	 * Postconditions: Return value is "There might be something here...\nYou found some creamy cream!\n".
-	 *                 Item.CREAM has been added to the Player.
-	 * </pre>
-	 */
-	@Test
-	public void testProcessCommandLCream() {
-		Mockito.when(player.checkCream()).thenReturn(true);
-
-		String retVal = cmq.processCommand("l");
-		if(retVal == "There might be something here...\nYou found some creamy cream!\n"){
-			Mockito.when(player.checkCream()).thenReturn(true);
-		}//end if 
-		assertEquals("The return value of processing the command 'l' was wrong","There might be something here...\nYou found some creamy cream!\n", retVal);	
-		assertTrue("The player doesn't have cream", player.checkCream());
-	}
-
-	/**
-	 * Test case for String processCommand("n").
-	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 *                cmq.setCurrentRoom(rooms.get(3)) has been called.
-	 * Execution steps: Call cmq.processCommand("n").
-	 *                  Call cmq.getCurrentRoom().
-	 * Postconditions: Return value of cmq.processCommand("n") is "".
-	 *                 Return value of cmq.getCurrentRoom() is rooms.get(4).
-	 * </pre>
-	 */
-	@Test
-	public void testProcessCommandN() {
-		cmq.setCurrentRoom(rooms.get(3));
-		String empty = cmq.processCommand("n");
-		Room retRoom = cmq.getCurrentRoom();
-
-		assertEquals("Return value of  cmq.processCommand('n') isn't empty","",empty );
-		assertEquals("Return value of cmq.getCurrentRoom() isn't rooms.get(4)", rooms.get(4), retRoom );
-
-		
-	}
-
-	/**
-	 * Test case for String processCommand("s").
-	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.processCommand("s").
-	 *                  Call cmq.getCurrentRoom().
-	 * Postconditions: Return value of cmq.processCommand("s") is "A door in that direction does not exist.\n".
-	 *                 Return value of cmq.getCurrentRoom() is rooms.get(0).
-	 * </pre>
-	 */
-	@Test
-	public void testProcessCommandS() {
-		String retString = cmq.processCommand("s");
-		Room retRoom = cmq.getCurrentRoom();
-
-		assertEquals("Return value of cmq.processCommand('s') isn't correct","A door in that direction does not exist.\n", retString);
-		assertEquals("Return value of cmq.getCurrentRoom() isn't rooms.get(0)",rooms.get(0), retRoom );
-	}
-
-	/**
-	 * Test case for String processCommand("D").
-	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 * Execution steps: Call cmq.processCommand("D").
-	 *                  Call cmq.isGameOver().
-	 * Postconditions: Return value of cmq.processCommand("D") is "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n\nYou drink thin air and can only dream of coffee. You cannot study.\nYou lose!\n".
-	 *                 Return value of cmq.isGameOver() is true.
-	 * </pre>
-	 */
-	@Test
-	public void testProcessCommandDLose() {
-		Mockito.when(player.checkCoffee()).thenReturn(false);
-		Mockito.when(player.checkCream()).thenReturn(false);
-		Mockito.when(player.checkSugar()).thenReturn(false);
-		Mockito.when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
-
-		String retString = cmq.processCommand("D");
-		boolean retBoolean = cmq.isGameOver();
-		
-
-		assertEquals("Return value of cmq.processCommand('D') is wrong","YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n\nYou drink thin air and can only dream of coffee. You cannot study.\nYou lose!\n", retString);
-		assertTrue("Return value of cmq.isGameOver() is false.", retBoolean);
-
-
-	}
-
-	/**
-	 * Test case for String processCommand("D").
-	 * 
-	 * <pre>
-	 * Preconditions: Player, rooms, and cmq test fixture has been created.
-	 *                Player has all 3 items (coffee, cream, sugar).
-	 * Execution steps: Call cmq.processCommand("D").
-	 *                  Call cmq.isGameOver().
-	 * Postconditions: Return value of cmq.processCommand("D") is "You have a cup of delicious coffee.\nYou have some fresh cream.\nYou have some tasty sugar.\n\nYou drink the beverage and are ready to study!\nYou win!\n".
-	 *                 Return value of cmq.isGameOver() is true.
-	 * </pre>
-	 */
-	@Test
-	public void testProcessCommandDWin() {
-		Mockito.when(player.checkCoffee()).thenReturn(true);
-		Mockito.when(player.checkCream()).thenReturn(true);
-		Mockito.when(player.checkSugar()).thenReturn(true);
-		Mockito.when(player.getInventoryString()).thenReturn("You have a cup of delicious coffee.\nYou have some fresh cream.\nYou have some tasty sugar.\n");
-
-		String retString = cmq.processCommand("D");
-		Boolean retBoolean = cmq.isGameOver();
-
-		assertEquals("Return value of cmq.processCommand('D') is wrong","You have a cup of delicious coffee.\nYou have some fresh cream.\nYou have some tasty sugar.\n\nYou drink the beverage and are ready to study!\nYou win!\n", retString);
-		assertTrue("Return value of cmq.isGameOver() is false.", retBoolean);
-
-	}
-
-	// TODO: Put in more unit tests of your own making to improve coverage!
 
 }
