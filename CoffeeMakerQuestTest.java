@@ -315,10 +315,10 @@ public class CoffeeMakerQuestTest {
 	 */
 	@Test
 	public void testProcessCommandDLose() {
-		// Mockito.when(player.checkCoffee()).thenReturn(false);
-		// Mockito.when(player.checkCream()).thenReturn(false);
-		// Mockito.when(player.checkSugar()).thenReturn(false);
-		// Mockito.when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
+		Mockito.when(player.checkCoffee()).thenReturn(false);
+		Mockito.when(player.checkCream()).thenReturn(false);
+		Mockito.when(player.checkSugar()).thenReturn(false);
+		Mockito.when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
 
 		String retString = cmq.processCommand("D");
 		boolean retBoolean = cmq.isGameOver();
