@@ -187,17 +187,17 @@ public class CoffeeMakerQuestImpl implements CoffeeMakerQuest {
 		else if(cmd.equals("L"))
 		{
 			if(getCurrentRoom().getItem() == Item.NONE){
-				retS = "You don't see anything out of the ordinary.";
+				retS = "You don't see anything out of the ordinary.\n";
 			}
 			else{
 				if(getCurrentRoom().getItem() == Item.SUGAR){
-					retS = "There might be something here...\nYou found some sweet sugar!";
+					retS = "There might be something here...\nYou found some sweet sugar!\n";
 				}
 				else if(getCurrentRoom().getItem() == Item.CREAM){
 					retS = "There might be something here...\nYou found some creamy cream!\n";
 				}
 				else if(getCurrentRoom().getItem() == Item.COFFEE){
-					retS = "There might be something here...\nYou found some caffeinated coffee!";
+					retS = "There might be something here...\nYou found some caffeinated coffee!\n";
 				}
 				player.addItem(getCurrentRoom().getItem());
 			}
@@ -223,7 +223,7 @@ public class CoffeeMakerQuestImpl implements CoffeeMakerQuest {
 
 		}
 		else if(cmd.equals("H")){
-			retS = "N - Go north\nS - Go south\nL - Look and collect any items in the room\nI - Show inventory of items collected\nD - Drink coffee made from items in inventory";
+			retS = "N - Go north\nS - Go south\nL - Look and collect any items in the room\nI - Show inventory of items collected\nD - Drink coffee made from items in inventory\n";
 		}
 		else{
 			retS = "What?";
