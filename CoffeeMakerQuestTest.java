@@ -27,7 +27,7 @@ public class CoffeeMakerQuestTest {
 		// Mockito.when(player.checkCoffee()).thenReturn(false);
 		// Mockito.when(player.checkSugar()).thenReturn(false);
 		// Mockito.when(player.checkCream()).thenReturn(false);
-		player = new Player();
+		player = Mockito.mock(Player.class);
 
 		// TODO: 2. Create 6 rooms as specified in rooms.config and add to rooms list.
 		Room roomOne = Mockito.mock(Room.class);
@@ -230,6 +230,8 @@ public class CoffeeMakerQuestTest {
 	 */
 	@Test
 	public void testProcessCommandI() {
+		Mockito.when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n");
+
 		String ret = cmq.processCommand("I");
 		assertEquals("Return from processing 'I' was incorrect\n", "YOU HAVE NO COFFEE!\nYOU HAVE NO CREAM!\nYOU HAVE NO SUGAR!\n", ret);
 	}
