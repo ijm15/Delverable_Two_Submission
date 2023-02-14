@@ -23,10 +23,6 @@ public class CoffeeMakerQuestTest {
 
 		// TODO: 1. Create a Player with no items (no coffee, no cream, no sugar)
 		// and assign to player.
-		// player =  Mockito.mock(Player.class);
-		// Mockito.when(player.checkCoffee()).thenReturn(false);
-		// Mockito.when(player.checkSugar()).thenReturn(false);
-		// Mockito.when(player.checkCream()).thenReturn(false);
 		player = Mockito.mock(Player.class);
 
 		// TODO: 2. Create 6 rooms as specified in rooms.config and add to rooms list.
@@ -335,7 +331,7 @@ public class CoffeeMakerQuestTest {
 	 *                Player has all 3 items (coffee, cream, sugar).
 	 * Execution steps: Call cmq.processCommand("D").
 	 *                  Call cmq.isGameOver().
-	 * Postconditions: Return value of cmq.processCommand("D") is "You have a cup of delicious coffee.\nYou have some fresh cream.\nYou have some tasty sugar.\n\nYou drink the beverage and are ready to study!\nYou win!\n".
+	 * Postconditions: Return value of cmq.processCommand("D") is "You have a cup of delicious coffee.\nYou have some creamy cream.\nYou have some tasty sugar.\n\nYou drink the beverage and are ready to study!\nYou win!\n".
 	 *                 Return value of cmq.isGameOver() is true.
 	 * </pre>
 	 */
@@ -353,6 +349,97 @@ public class CoffeeMakerQuestTest {
 		assertTrue("Return value of cmq.isGameOver() is false.", retBoolean);
 
 	}
+
+
+
+	/**
+	 * Test case for String processCommand("d") with one ingredient.
+	 * 
+	 * <pre>
+	 * Preconditions: Player, rooms, and cmq test fixture has been created.
+	 *                Player has Cream but no sugar or cofee
+	 * Execution steps: Call cmq.processCommand("D").
+	 *                  Call cmq.isGameOver().
+	 * Postconditions: Return value of cmq.processCommand("D") is "YOU HAVE NO COFFEE!\nYou have some fresh cream.\nYOU HAVE NO SUGAR!\n\nYou refuse to drink this half-made sludge. You cannot study.\nYou lose!\n".
+	 *                 Return value of cmq.isGameOver() is false.
+	 * </pre>
+	 */
+	@Test
+	public void testPrivateMethodOneIngredient() {
+		Mockito.when(player.checkCream()).thenReturn(true);
+		Mockito.when(player.getInventoryString()).thenReturn("YOU HAVE NO COFFEE!\nYou have some fresh cream.\nYOU HAVE NO SUGAR!\n");
+
+		String retString = cmq.processCommand("D");
+		Boolean retBoolean = cmq.isGameOver();
+
+		assertEquals("Return value of cmq.processCommand('D') is wrong","YOU HAVE NO COFFEE!\nYou have some fresh cream.\nYOU HAVE NO SUGAR!\n\nYou refuse to drink this half-made sludge. You cannot study.\nYou lose!\n", retString);
+		assertTrue("Return value of cmq.isGameOver() is false.", retBoolean);
+
+	}
+
+
+
+
+
+	/**
+	 * Test case for the output of processCommand("H").
+	 * 
+	 * <pre>
+	 * Preconditions: Player, rooms, and cmq test fixture has been created.
+	 * Execution steps: Call cmq.processCommand("H").
+	 * Postconditions: Return value of cmq.processCommand("H") is "N - Go north\nS - Go south\nL - Look and collect any items in the room\nI - Show inventory of items collected\nD - Drink coffee made from items in inventory\n"
+		}
+	 * </pre>
+	 */
+	@Test
+	public void testProcessCommandH() {
+
+		String retString = cmq.processCommand("H");
+
+		assertEquals("cmq.processCommand('H') returned an unexpected String", "N - Go north\nS - Go south\nL - Look and collect any items in the room\nI - Show inventory of items collected\nD - Drink coffee made from items in inventory\n",retString);
+	}
+
+
+	/**
+	 * Test case for the output of processCommand("X").
+	 * 
+	 * <pre>
+	 * Preconditions: Player, rooms, and cmq test fixture has been created.
+	 * Execution steps: Call cmq.processCommand("X").
+	 * Postconditions: Return value of cmq.processCommand("H") is "What?\n"
+		}
+	 * </pre>
+	 */
+	@Test
+	public void testProcessCommandX() {
+
+		String retString = cmq.processCommand("X");
+
+		assertEquals("cmq.processCommand('X') returned an unexpected String", "What?\n",retString);
+	}
+
+
+	/**
+	 * Test case for the output of processCommand("L") in a room with no item.
+	 * 
+	 * <pre>
+	 * Preconditions: Player, rooms, and cmq test fixture has been created.
+	 * 				  cmq.setCurrentRoom(rooms.get(1)) has been called
+	 * Execution steps: Call cmq.processCommand("L").
+	 * Postconditions: Return value of cmq.processCommand("L") is "You don't see anything out of the ordinary.\n"
+		}
+	 * </pre>
+	 */
+	@Test
+	public void testProcessCommandLEmptyRoom() {
+		cmq.setCurrentRoom(rooms.get(1));
+
+		String retString = cmq.processCommand("L");
+
+		assertEquals("cmq.processCommand('L') returned an unexpected String", "You don't see anything out of the ordinary.\n",retString);
+	}
+
+
 
 	// TODO: Put in more unit tests of your own making to improve coverage!
 
