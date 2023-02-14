@@ -344,15 +344,10 @@ public class CoffeeMakerQuestTest {
 	 */
 	@Test
 	public void testProcessCommandDWin() {
-
-		cmq.processCommand("l");
-		cmq.processCommand("n");
-		cmq.processCommand("n");
-		cmq.processCommand("l");
-		cmq.processCommand("n");
-		cmq.processCommand("n");
-		cmq.processCommand("n");
-		cmq.processCommand("l");
+		Mockito.when(player.checkCoffee()).thenReturn(true);
+		Mockito.when(player.checkCream()).thenReturn(true);
+		Mockito.when(player.checkSugar()).thenReturn(true);
+		Mockito.when(player.getInventoryString()).thenReturn("You have a cup of delicious coffee.\nYou have some fresh cream.\nYou have some tasty sugar.\n");
 
 		String retString = cmq.processCommand("D");
 		Boolean retBoolean = cmq.isGameOver();
